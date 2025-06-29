@@ -1,0 +1,95 @@
+/* ====== Color Palette Variables ====== */
+:root {
+    --primary-color: #61dafb;
+    --text-light: #ccc;
+    --footer-text: #777;
+    --background-dark: #1A1A19;
+    --accent-dark: #2C2C2C;
+    --accent-purple: #3D0301;
+    --accent-light: #FFEDFA;
+    --font-main: 'Poppins', sans-serif;
+}
+
+/* ====== Body & Global Styling ====== */
+body {
+    background-color: var(--background-dark);
+    color: var(--text-light);
+    font-family: var(--font-main);
+    margin: 0;
+    padding: 0;
+}
+
+/* ====== Title ====== */
+.title {
+    color: var(--primary-color);
+    text-align: center;
+    font-size: 3em;
+    font-weight: bold;
+    margin-top: 30px;
+}
+
+/* ====== Subtitle ====== */
+.subtitle {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 1.3em;
+    margin-bottom: 30px;
+}
+
+/* ====== Main Container ====== */
+.container {
+    background-color: var(--accent-dark);
+    padding: 40px;
+    border-radius: 12px;
+    max-width: 800px;
+    margin: auto;
+    box-shadow: 0 0 20px rgba(255, 237, 250, 0.05);
+}
+
+/* ====== Buttons ====== */
+button {
+    background-color: var(--accent-purple);
+    color: var(--accent-light);
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: var(--primary-color);
+    color: #000;
+}
+
+/* ====== Input & Text Areas ====== */
+input, textarea {
+    background-color: #2C2C2C;
+    color: var(--accent-light);
+    border: 1px solid var(--accent-purple);
+    border-radius: 6px;
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* ====== Footer ====== */
+footer, .footer {
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--footer-text);
+    margin-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* ====== Logo ====== */
+.logo {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 20px auto;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(97, 218, 251, 0.2);
+}
