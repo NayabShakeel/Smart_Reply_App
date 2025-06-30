@@ -10,20 +10,33 @@ st.write("API Key Loaded:", bool(api_key))  # Debug
 # Set page config
 st.set_page_config(page_title="Smart Email Reply", layout="centered")
 
-# Read external CSS for cleaner GUI
+# Load external style.css
 with open("style.css") as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Page structure
+# Page title and subtitle
 st.markdown("""
     <div class='title'>Smart Email Reply</div>
     <div class='subtitle'>Generate polished and professional email responses</div>
 """, unsafe_allow_html=True)
 
-# Email input
-email_input = st.text_area("Paste your received email below:", height=200)
+# Optional: Light mode toggle
+light_mode = st.checkbox("Enable Light Mode")
+if light_mode:
+    st.markdown("""
+        <style>
+            body, .response-box {
+                background-color: #ffffff !important;
+                color: #000000 !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-# Generate reply function
+# Text input area
+email_input = st.text_area("Paste your received email below:", height=200)
+st.markdown(f"<div class='char-count'>{len(email_input)} characters</div>", unsafe_allow_html=True)
+
+# Reply generation function
 def generate_reply(email_text):
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -57,13 +70,24 @@ def generate_reply(email_text):
     except Exception as e:
         return f"Exception: {e}"
 
-# Button logic
+# Reply generation + UI
 if st.button("Generate Reply") and email_input.strip():
     with st.spinner("Generating..."):
         reply = generate_reply(email_input)
+
         st.markdown("<div class='response-box'>" + reply + "</div>", unsafe_allow_html=True)
 
-        # Download button
+        #  Toast Notification
+        st.markdown("""
+            <script>
+                document.body.insertAdjacentHTML('beforeend', '<div class="toast">Reply generated successfully ✔️</div>');
+                setTimeout(() => {
+                    document.querySelector('.toast')?.remove();
+                }, 3000);
+            </script>
+        """, unsafe_allow_html=True)
+
+        #  Download reply button
         b64 = base64.b64encode(reply.encode()).decode()
         href = f'<a href="data:file/txt;base64,{b64}" download="smart_reply.txt" class="download-button">Download Reply</a>'
         st.markdown(href, unsafe_allow_html=True)
