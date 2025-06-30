@@ -1,21 +1,58 @@
 import os
 import streamlit as st
 import requests
+import base64
 
 # Load API key
 api_key = os.getenv("OPENAI_API_KEY")
-st.write("🔐 API Key Loaded:", bool(api_key))  # Debug line
+st.write("🔐 API Key Loaded:", bool(api_key))  # Keep only this debug
 
 # Page config
 st.set_page_config(page_title="Smart Email Reply", layout="centered")
 
-# Page Header
+# Custom Styles and JS
 st.markdown("""
     <style>
         .title { text-align: center; color: #61dafb; font-size: 3em; font-weight: bold; margin-top: 30px; }
         .subtitle { text-align: center; color: #ccc; font-size: 1.3em; margin-bottom: 30px; }
-        .response-box { background-color: #2C2C2C; color: #fff; padding: 20px; border-radius: 10px; font-size: 1em; margin-top: 20px; }
+        .response-box {
+            background-color: #2C2C2C;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        .copy-button {
+            background-color: #3D0301;
+            color: #FFEDFA;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .download-button {
+            background-color: #61dafb;
+            color: #000;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
+    <script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('✅ Copied to clipboard!');
+        }, function(err) {
+            alert('❌ Failed to copy text: ', err);
+        });
+    }
+    </script>
 """, unsafe_allow_html=True)
 
 st.markdown("<div class='title'>📨 Smart Email Reply</div>", unsafe_allow_html=True)
@@ -26,18 +63,11 @@ email_input = st.text_area("📩 Paste your received email below:", height=200)
 
 # Generate reply
 def generate_reply(email_text):
-    # Use referer version first (Streamlit Cloud only works with real app link)
-    headers_with_referer = {
+    headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://smartemailreply.streamlit.app",  # Change to your actual app URL
+        "HTTP-Referer": "https://smartemailreply.streamlit.app",  # Update if needed
         "X-Title": "SmartEmailReplyApp"
-    }
-
-    # Backup header (for local testing)
-    headers_simple = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
     }
 
     payload = {
@@ -53,30 +83,13 @@ def generate_reply(email_text):
     }
 
     try:
-        # Try with full headers first
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers_with_referer, json=payload)
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
         result = response.json()
-
-        # Debug output
-        st.write("🧾 Request Headers:", headers_with_referer)
-        st.write("📦 Payload Sent:", payload)
-        st.write("📬 Raw Response:", result)
 
         if "choices" in result:
             return result["choices"][0]["message"]["content"].strip()
         elif "error" in result:
-            # Try again using simple headers (for local fallback)
-            fallback_response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers_simple, json=payload)
-            fallback_result = fallback_response.json()
-            st.write("🪛 Fallback Headers:", headers_simple)
-            st.write("🪛 Fallback Raw Response:", fallback_result)
-
-            if "choices" in fallback_result:
-                return fallback_result["choices"][0]["message"]["content"].strip()
-            elif "error" in fallback_result:
-                return f"❌ API Error (Fallback too): {fallback_result['error']['message']}"
-            else:
-                return f"❌ Unexpected fallback response: {fallback_result}"
+            return f"❌ API Error: {result['error']['message']}"
         else:
             return f"❌ Unexpected response: {result}"
     except Exception as e:
@@ -87,4 +100,14 @@ if st.button("Generate Reply ✨") and email_input.strip():
     with st.spinner("Thinking..."):
         reply = generate_reply(email_input)
         st.markdown("### 💬 Suggested Reply:")
-        st.markdown(f"<div class='response-box'>{reply}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='response-box' id='replyBox'>{reply}</div>", unsafe_allow_html=True)
+
+        # Copy to clipboard
+        st.markdown(f"""
+            <button class='copy-button' onclick="copyToClipboard(`{reply}`)">📋 Copy to Clipboard</button>
+        """, unsafe_allow_html=True)
+
+        # Download as TXT
+        b64 = base64.b64encode(reply.encode()).decode()
+        href = f'<a href="data:file/txt;base64,{b64}" download="smart_reply.txt" class="download-button">⬇️ Download Reply</a>'
+        st.markdown(href, unsafe_allow_html=True)
