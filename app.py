@@ -2,26 +2,60 @@ import os
 import streamlit as st
 import requests
 
-# Get API key from environment variable
+# Load API key from environment
 api_key = os.getenv("OPENAI_API_KEY")
 
-# Streamlit page setup
+# Set Streamlit page config
 st.set_page_config(page_title="Smart Email Reply", layout="centered")
-st.markdown("<h1 class='title'>📨 Smart Email Reply Generator</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Generate formal email replies using DeepSeek R1</p>", unsafe_allow_html=True)
+
+# ----- HTML Style -----
+st.markdown("""
+    <style>
+    body {
+        background-color: #1A1A19;
+        color: #ccc;
+        font-family: 'Poppins', sans-serif;
+    }
+    .title {
+        text-align: center;
+        color: #61dafb;
+        font-size: 3em;
+        font-weight: bold;
+        margin-top: 30px;
+    }
+    .subtitle {
+        text-align: center;
+        color: #ccc;
+        font-size: 1.3em;
+        margin-bottom: 30px;
+    }
+    .response-box {
+        background-color: #2C2C2C;
+        color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        font-size: 1em;
+        margin-top: 20px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Title
+st.markdown("<div class='title'>📨 Smart Email Reply</div>", unsafe_allow_html=True)
+st.markdown("<div class='subtitle'>Generate formal replies using DeepSeek R1 (via OpenRouter)</div>", unsafe_allow_html=True)
 
 # Input
-email_input = st.text_area("📩 Paste the email you received:", height=200)
+email_input = st.text_area("Paste the email you received:", height=200)
 
-# Generate reply function
+# Function to send request
 def generate_reply(email_text):
     if not api_key:
-        return "❌ API key is missing."
+        return "❌ API key not loaded."
 
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://streamlit.io",  # required for OpenRouter
+        "HTTP-Referer": "https://streamlit.io",   # Required
         "X-Title": "SmartEmailReplyApp"
     }
 
@@ -41,24 +75,18 @@ def generate_reply(email_text):
         response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
         result = response.json()
 
-        # Debugging logs
         if "choices" in result:
             return result["choices"][0]["message"]["content"].strip()
         elif "error" in result:
             return f"❌ API Error: {result['error']['message']}"
         else:
-            return f"❌ Unexpected response:\n{result}"
+            return f"❌ Unexpected response: {result}"
     except Exception as e:
         return f"⚠️ Exception: {e}"
 
-# Run when button clicked
+# Button to trigger
 if st.button("Generate Reply ✨") and email_input.strip():
-    with st.spinner("Generating your reply..."):
+    with st.spinner("Please wait..."):
         reply = generate_reply(email_input)
         st.markdown("### 💬 Suggested Reply:")
-        st.success(reply)
-
-# Inject style if available
-if os.path.exists("style.css"):
-    with open("style.css") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+        st.markdown(f"<div class='response-box'>{reply}</div>", unsafe_allow_html=True)
