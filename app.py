@@ -4,6 +4,8 @@ import requests
 
 # Load API key
 api_key = os.getenv("OPENAI_API_KEY")
+st.write("🔐 API Key Loaded:", bool(api_key))
+
 
 # Page config
 st.set_page_config(page_title="Smart Email Reply", layout="centered")
