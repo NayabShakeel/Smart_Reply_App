@@ -4,6 +4,7 @@ import requests
 
 # Load API Key securely
 api_key = os.getenv("OPENAI_API_KEY")
+st.write("🔐 API Key Loaded:", bool(api_key))
 
 # Set up Streamlit page
 st.set_page_config(page_title="Smart Email Reply", layout="centered")
