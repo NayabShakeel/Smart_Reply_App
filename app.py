@@ -6,7 +6,7 @@ import requests
 api_key = os.getenv("OPENAI_API_KEY")
 ##st.write("Headers:", headers)
 ##st.write("Payload:", payload)
-st.write("Raw Response:", result)
+#st.write("Raw Response:", result)
 st.write("🔐 API Key Loaded:", bool(api_key))
 
 
