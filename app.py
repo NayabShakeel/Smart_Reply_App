@@ -1,40 +1,51 @@
 import os
 import streamlit as st
-from openai import OpenAI
+import requests
 
-# Initialize client with API key from environment variable
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Load API Key securely
+api_key = os.getenv("OPENAI_API_KEY")
 
-st.set_page_config(page_title="Smart Reply with OpenAI", layout="centered")
+# Streamlit Page Config
+st.set_page_config(page_title="Smart Reply with OpenRouter", layout="centered")
 
-st.markdown("<h1 style='text-align: center; color: #FFEDFA;'>SMART REPLY</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #ccc;'>AI-Powered Email Response Generator</p>", unsafe_allow_html=True)
+# Title and subtitle
+st.markdown("<h1 class='title'>SMART REPLY</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>AI-Powered Email Response Generator</p>", unsafe_allow_html=True)
 
-email_input = st.text_area("Paste the email you received:", height=200)
+# Text input
+email_input = st.text_area("📩 Paste the email you received:", height=200)
 
-def generate_reply_via_openai(email_text):
-    prompt = (
-        "You are an assistant. Write a professional and polite reply to the following email:\n\n"
-        f"{email_text}\n\nReply:"
-    )
+# Function to get reply from OpenRouter/DeepSeek
+def generate_reply(email_text):
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "user", "content": f"You are an assistant. Write a professional and polite reply to the following email:\n\n{email_text}\n\nReply:"}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 256,
+        "top_p": 0.9
+    }
+
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=256,
-            top_p=0.9,
-            n=1,
-        )
-        reply = response.choices[0].message.content.strip()
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+        reply = response.json()['choices'][0]['message']['content'].strip()
         return reply
     except Exception as e:
-        return f"Error generating reply: {e}"
+        return f"⚠️ Error: {e}"
 
-if st.button("Generate Reply") and email_input.strip():
-    with st.spinner("Generating reply..."):
-        reply = generate_reply_via_openai(email_input)
-        st.markdown("### Suggested Reply:")
-        st.success(reply)
+# Button to trigger reply generation
+if st.button("Generate Reply ✨") and email_input.strip():
+    with st.spinner("Generating your reply..."):
+        response = generate_reply(email_input)
+        st.markdown("### ✉️ Suggested Reply:")
+        st.success(response)
+
+# Custom styling
+with open("style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
