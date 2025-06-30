@@ -47,7 +47,7 @@ body {
 }
 
 /* ====== Buttons ====== */
-button {
+button, .button {
     background-color: var(--accent-purple);
     color: var(--accent-light);
     padding: 10px 25px;
@@ -56,9 +56,12 @@ button {
     cursor: pointer;
     font-weight: 600;
     transition: 0.3s ease-in-out;
+    font-family: var(--font-main);
+    display: inline-block;
+    margin-top: 10px;
 }
 
-button:hover {
+button:hover, .button:hover {
     background-color: var(--primary-color);
     color: #000;
 }
@@ -73,6 +76,20 @@ input, textarea {
     width: 100%;
     margin-top: 10px;
     margin-bottom: 20px;
+    font-family: var(--font-main);
+    font-size: 1em;
+}
+
+/* ====== Response Box ====== */
+.response-box {
+    background-color: var(--accent-dark);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 1em;
+    margin-top: 20px;
+    white-space: pre-wrap;
+    border: 1px solid var(--primary-color);
 }
 
 /* ====== Footer ====== */
@@ -92,4 +109,45 @@ footer, .footer {
     margin: 20px auto;
     border-radius: 50%;
     box-shadow: 0 0 15px rgba(97, 218, 251, 0.2);
+}
+
+/* ====== Utility Classes ====== */
+.text-center {
+    text-align: center;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+/* ====== Download Button ====== */
+.download-button {
+    background-color: var(--primary-color);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.download-button:hover {
+    background-color: #48c6f2;
+    color: #000;
+}
+
+/* ====== Debug Area (Optional) ====== */
+.debug-area {
+    background: #2b2b2b;
+    color: #fff;
+    padding: 10px;
+    font-size: 0.85em;
+    border-radius: 5px;
+    margin-top: 10px;
+    overflow-x: auto;
 }
