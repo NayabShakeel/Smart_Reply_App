@@ -4,8 +4,7 @@ import requests
 
 # Load API key
 api_key = os.getenv("OPENAI_API_KEY")
-st.write("🔐 API Key Loaded:", bool(api_key))
-
+st.write("🔐 API Key Loaded:", bool(api_key))  # Debug line
 
 # Page config
 st.set_page_config(page_title="Smart Email Reply", layout="centered")
@@ -27,11 +26,18 @@ email_input = st.text_area("📩 Paste your received email below:", height=200)
 
 # Generate reply
 def generate_reply(email_text):
-    headers = {
+    # Use referer version first (Streamlit Cloud only works with real app link)
+    headers_with_referer = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://streamlit.io",
+        "HTTP-Referer": "https://smartemailreply.streamlit.app",  # Change to your actual app URL
         "X-Title": "SmartEmailReplyApp"
+    }
+
+    # Backup header (for local testing)
+    headers_simple = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
     }
 
     payload = {
@@ -47,19 +53,36 @@ def generate_reply(email_text):
     }
 
     try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload)
+        # Try with full headers first
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers_with_referer, json=payload)
         result = response.json()
+
+        # Debug output
+        st.write("🧾 Request Headers:", headers_with_referer)
+        st.write("📦 Payload Sent:", payload)
+        st.write("📬 Raw Response:", result)
 
         if "choices" in result:
             return result["choices"][0]["message"]["content"].strip()
         elif "error" in result:
-            return f"❌ API Error: {result['error']['message']}"
+            # Try again using simple headers (for local fallback)
+            fallback_response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers_simple, json=payload)
+            fallback_result = fallback_response.json()
+            st.write("🪛 Fallback Headers:", headers_simple)
+            st.write("🪛 Fallback Raw Response:", fallback_result)
+
+            if "choices" in fallback_result:
+                return fallback_result["choices"][0]["message"]["content"].strip()
+            elif "error" in fallback_result:
+                return f"❌ API Error (Fallback too): {fallback_result['error']['message']}"
+            else:
+                return f"❌ Unexpected fallback response: {fallback_result}"
         else:
             return f"❌ Unexpected response: {result}"
     except Exception as e:
         return f"⚠️ Exception: {e}"
 
-# Button
+# Button to trigger reply
 if st.button("Generate Reply ✨") and email_input.strip():
     with st.spinner("Thinking..."):
         reply = generate_reply(email_input)
