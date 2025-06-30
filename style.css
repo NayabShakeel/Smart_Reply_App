@@ -151,3 +151,54 @@ footer, .footer {
     margin-top: 10px;
     overflow-x: auto;
 }
+
+/* ====== Loader Spinner ====== */
+.loader {
+    border: 4px solid var(--accent-dark);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ====== Character Count ====== */
+.char-count {
+    font-size: 0.9em;
+    color: var(--footer-text);
+    text-align: right;
+    margin-top: -15px;
+    margin-bottom: 10px;
+}
+
+/* ====== Theme Toggle ====== */
+.toggle-theme {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -20px;
+    margin-bottom: 10px;
+}
+.toggle-theme input {
+    cursor: pointer;
+}
+
+/* ====== Toast Notification ====== */
+.toast {
+    background-color: var(--accent-purple);
+    color: var(--accent-light);
+    padding: 10px 20px;
+    border-radius: 8px;
+    position: fixed;
+    bottom: 40px;
+    right: 30px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+}
+.toast
