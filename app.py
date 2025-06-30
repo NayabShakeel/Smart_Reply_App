@@ -102,12 +102,11 @@ if st.button("Generate Reply ✨") and email_input.strip():
         st.markdown("### 💬 Suggested Reply:")
         st.markdown(f"<div class='response-box' id='replyBox'>{reply}</div>", unsafe_allow_html=True)
 
-        # Copy to clipboard
-        st.markdown(f"""
-            <button class='copy-button' onclick="copyToClipboard(`{reply}`)">📋 Copy to Clipboard</button>
-        """, unsafe_allow_html=True)
-
-        # Download as TXT
+               # Download as TXT 
         b64 = base64.b64encode(reply.encode()).decode()
-        href = f'<a href="data:file/txt;base64,{b64}" download="smart_reply.txt" class="download-button">⬇️ Download Reply</a>'
+        href = f'''
+            <a href="data:file/txt;base64,{b64}" download="smart_reply.txt" class="download-button">
+                ⬇️ Download Reply
+            </a>
+        '''
         st.markdown(href, unsafe_allow_html=True)
